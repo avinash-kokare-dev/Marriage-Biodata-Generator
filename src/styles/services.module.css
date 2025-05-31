@@ -1,0 +1,62 @@
+.services {
+  background: linear-gradient(135deg, rgba(233, 30, 99, 0.1), rgba(255, 64, 129, 0.1));
+  padding: 80px 20px;
+  text-align: center;
+  margin-top: 50px;
+  border-radius: 15px;
+}
+
+.title {
+  font-size: 40px;
+  margin-bottom: 40px;
+  font-weight: bold;
+  color: #333;
+}
+
+.servicesList {
+  display: flex;
+  justify-content: space-around;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.service {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 30%;
+  margin-bottom: 40px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.service h3 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.service p {
+  font-size: 16px;
+  color: #555;
+}
+
+.service:hover {
+  transform: translateY(-10px);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .servicesList {
+    flex-direction: column;  /* Stack services vertically */
+    align-items: center;
+  }
+
+  .service {
+    width: 80%;  /* Make each service take up more width on mobile */
+    margin-bottom: 20px;
+  }
+
+  .title {
+    font-size: 32px;
+  }
+}

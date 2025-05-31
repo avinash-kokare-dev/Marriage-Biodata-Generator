@@ -1,0 +1,143 @@
+:root {
+  --primary-color: #0070f3;
+  --dark-color: #333333;
+  --light-color: #f0f0f0;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 1rem 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.desktopLinks {
+  display: none;
+}
+
+.navLink {
+  font-weight: 500;
+  transition: color 0.3s ease;
+  color: var(--dark-color);
+  text-decoration: none;
+}
+
+.navLink:hover {
+  color: var(--primary-color);
+}
+
+.menuButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  z-index: 1001;
+  display: block;
+}
+
+.hamburger {
+  width: 24px;
+  height: 2px;
+  background-color: var(--dark-color);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.hamburger::before,
+.hamburger::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 2px;
+  background-color: var(--dark-color);
+  transition: all 0.3s ease;
+}
+
+.hamburger::before {
+  transform: translateY(-8px);
+}
+
+.hamburger::after {
+  transform: translateY(8px);
+}
+
+.hamburger.open {
+  background-color: transparent;
+}
+
+.hamburger.open::before {
+  transform: rotate(45deg);
+}
+
+.hamburger.open::after {
+  transform: rotate(-45deg);
+}
+
+.mobileMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  overflow: hidden;
+  max-height: 0;
+  padding: 0;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  z-index: 999;
+}
+
+.mobileMenu.open {
+  max-height: 500px; /* enough to show all links */
+  padding: 1rem 0;
+}
+
+.mobileLink {
+  display: block;
+  padding: 1rem 2rem;
+  font-weight: 500;
+  color: var(--dark-color);
+  text-decoration: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.mobileLink:hover {
+  background-color: var(--light-color);
+  color: var(--primary-color);
+}
+
+/* Desktop view */
+@media (min-width: 768px) {
+  .desktopLinks {
+    display: flex;
+    gap: 2rem;
+  }
+
+  .menuButton {
+    display: none;
+  }
+
+  .mobileMenu {
+    display: none;
+  }
+}
