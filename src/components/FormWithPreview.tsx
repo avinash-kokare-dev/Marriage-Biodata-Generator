@@ -1,306 +1,241 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import styles from '../styles/formwithpreview.module.css';
+import React, { useState, useEffect } from 'react';
+import styles from '../styles/form.module.css';
 
-interface Field {
-  label: string;
-  value: string;
-  error?: string;
-  type?: string;
-}
+const STORAGE_KEY = 'biodataForm';
 
-const initialPersonalFields: Field[] = [
-  { label: 'Name', value: 'Name' },
-  { label: 'Gender', value: 'Gender' },
-  // We'll remove original 'Date of Birth' and add separate date and time fields
-  { label: 'Date of Birth', value: '', type: 'date' },
-  { label: 'Time of Birth', value: '', type: 'time' },
-  { label: 'Place of Birth', value: 'Place of Birth' },
-  { label: 'Complexion', value: 'Complexion' },
-  { label: 'Height', value: 'Height' },
-  { label: 'Gotra/Caste', value: 'Gotra/Caste' },
-  { label: 'Occupation', value: 'Occupation' },
-  { label: 'Income', value: 'Income', type: 'number' },
-  { label: 'Education', value: 'Education' },
-];
+const initialFields = {
+  personal: [
+    { id: 'fullName', label: 'Full Name', type: 'text', value: '', isEditing: false },
+    { id: 'gender', label: 'Gender', type: 'select', options: ['Male', 'Female', 'Other'], value: '', isEditing: false },
+    { id: 'dob', label: 'Date of Birth', type: 'date', value: '', isEditing: false },
+    { id: 'height', label: 'Height (cm)', type: 'text', value: '', isEditing: false },
+    { id: 'religion', label: 'Religion', type: 'text', value: '', isEditing: false },
+  ],
+  professional: [
+    { id: 'education', label: 'Education', type: 'text', value: '', isEditing: false },
+    { id: 'occupation', label: 'Occupation', type: 'text', value: '', isEditing: false },
+    { id: 'income', label: 'Income', type: 'text', value: '', isEditing: false },
+  ],
+  contact: [
+    { id: 'phone', label: 'Phone', type: 'text', value: '', isEditing: false },
+    { id: 'email', label: 'Email', type: 'email', value: '', isEditing: false },
+    { id: 'address', label: 'Address', type: 'textarea', value: '', isEditing: false },
+  ],
+};
 
-const initialFamilyFields: Field[] = [
-  { label: "Father's Name", value: "Father's Name" },
-  { label: "Father's Occupation", value: "Father's Occupation" },
-  { label: "Mother's Name", value: "Mother's Name" },
-  { label: "Mother's Occupation", value: "Mother's Occupation" },
-  { label: 'Brother(s)', value: 'Brother(s)', type: 'number' },
-  { label: 'Sister(s)', value: 'Sister(s)', type: 'number' },
-];
+const BiodataForm = () => {
+  const [fields, setFields] = useState(initialFields);
+  const [photo, setPhoto] = useState(null);
 
-const initialContactFields: Field[] = [
-  { label: 'Contact Person', value: 'Contact Person' },
-  { label: 'Contact Number', value: 'Contact Number', type: 'tel' },
-  { label: 'Residential Address', value: 'Residential Address' },
-];
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) setFields(JSON.parse(saved));
+  }, []);
 
-const FormWithPreview = () => {
-  const [personalFields, setPersonalFields] = useState<Field[]>(initialPersonalFields);
-  const [familyFields, setFamilyFields] = useState<Field[]>(initialFamilyFields);
-  const [contactFields, setContactFields] = useState<Field[]>(initialContactFields);
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(fields));
+  }, [fields]);
 
-  const [photo, setPhoto] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string>('');
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  // Helper to update field label & value
-  const handleLabelChange = (
-    section: 'personal' | 'family' | 'contact',
-    index: number,
-    newLabel: string
-  ) => {
-    const updater = (fields: Field[], setFields: React.Dispatch<React.SetStateAction<Field[]>>) => {
-      const updated = [...fields];
-      updated[index].label = newLabel;
-      // If value was default label, update value also
-      if (!updated[index].value || updated[index].value === fields[index].label) {
-        updated[index].value = newLabel;
-      }
-      setFields(updated);
-    };
-    if (section === 'personal') updater(personalFields, setPersonalFields);
-    else if (section === 'family') updater(familyFields, setFamilyFields);
-    else updater(contactFields, setContactFields);
+  const handleFieldChange = (group, id, value) => {
+    setFields(prev => ({
+      ...prev,
+      [group]: prev[group].map(field =>
+        field.id === id ? { ...field, value } : field
+      ),
+    }));
   };
 
-  // Helper to update value
-  const handleValueChange = (
-    section: 'personal' | 'family' | 'contact',
-    index: number,
-    newValue: string
-  ) => {
-    const updater = (fields: Field[], setFields: React.Dispatch<React.SetStateAction<Field[]>>) => {
-      const updated = [...fields];
-      updated[index].value = newValue;
-      setFields(updated);
-    };
-    if (section === 'personal') updater(personalFields, setPersonalFields);
-    else if (section === 'family') updater(familyFields, setFamilyFields);
-    else updater(contactFields, setContactFields);
+  const handleLabelChange = (group, id, value) => {
+    setFields(prev => ({
+      ...prev,
+      [group]: prev[group].map(field =>
+        field.id === id ? { ...field, label: value } : field
+      ),
+    }));
   };
 
-  // Photo handlers remain unchanged
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleDelete = (group, id) => {
+    setFields(prev => ({
+      ...prev,
+      [group]: prev[group].filter(field => field.id !== id),
+    }));
+  };
+
+  const handleAddField = (group) => {
+    const newId = `custom_${Date.now()}`;
+    const newField = {
+      id: newId,
+      label: 'New Field',
+      type: 'text',
+      value: '',
+      isEditing: true,
+    };
+    setFields(prev => ({
+      ...prev,
+      [group]: [...prev[group], newField],
+    }));
+  };
+
+  const handleReset = () => {
+    setFields(initialFields);
+    localStorage.removeItem(STORAGE_KEY);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const output = {};
+    Object.keys(fields).forEach(group => {
+      fields[group].forEach(field => {
+        output[field.label] = field.value;
+      });
+    });
+    console.log('Submitted Data:', output);
+  };
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
     if (file) {
-      setPhoto(file);
-      setPhotoPreview(URL.createObjectURL(file));
+      const reader = new FileReader();
+      reader.onloadend = () => setPhoto(reader.result);
+      reader.readAsDataURL(file);
     }
   };
 
-  const handlePhotoRemove = () => {
-    setPhoto(null);
-    setPhotoPreview('');
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
-
-  // Form submit handler
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const data = {
-      PersonalDetails: personalFields.reduce((acc, f) => ({ ...acc, [f.label]: f.value }), {}),
-      FamilyDetails: familyFields.reduce((acc, f) => ({ ...acc, [f.label]: f.value }), {}),
-      ContactDetails: contactFields.reduce((acc, f) => ({ ...acc, [f.label]: f.value }), {}),
-      PhotoFilename: photo?.name || '',
-    };
-    alert(JSON.stringify(data, null, 2));
-  };
-
-  // Render fields function with custom logic for date and time types
-  const renderFields = (fields: Field[], section: 'personal' | 'family' | 'contact') =>
-    fields.map((field, i) => {
-      if (field.type === 'date') {
-        // Date picker with year dropdown, no time
-        return (
-          <div className={styles.fieldRow} key={`${section}-${i}`}>
-            <input
-              type="text"
-              className={styles.labelInput}
-              value={field.label}
-              onChange={e => handleLabelChange(section, i, e.target.value)}
-              aria-label={`Edit label for ${field.label}`}
-            />
-            <input
-              type="date"
-              className={styles.valueInput}
-              value={field.value}
-              onChange={e => handleValueChange(section, i, e.target.value)}
-              aria-label={`Edit label for ${field.label}`}
-            />
-            
-          </div>
-        );
-      } else if (field.type === 'time') {
-        // Time picker with seconds only (hours, minutes, seconds)
-        // We'll store value as "HH:mm:ss"
-        return (
-          <div className={styles.fieldRow} key={`${section}-${i}`}>
-            <input
-              type="text"
-              className={styles.labelInput}
-              value={field.label}
-              onChange={e => handleLabelChange(section, i, e.target.value)}
-              aria-label={`Edit label for ${field.label}`}
-            />
-            <DatePicker
-              selected={
-                field.value
-                  ? new Date(`1970-01-01T${field.value}`) // Dummy date, only time matters
-                  : null
-              }
-              onChange={date => {
-                if (date) {
-                  const hours = date.getHours().toString().padStart(2, '0');
-                  const minutes = date.getMinutes().toString().padStart(2, '0');
-                  const seconds = date.getSeconds().toString().padStart(2, '0');
-                  const timeStr = `${hours}:${minutes}:${seconds}`;
-                  handleValueChange(section, i, timeStr);
-                } else {
-                  handleValueChange(section, i, '');
-                }
-              }}
-              showTimeSelect
-              showTimeSelectOnly
-              timeIntervals={1} // 1 min intervals, seconds selectable with keyboard
-              timeCaption="Time"
-              dateFormat="HH:mm:ss"
-              placeholderText={`Select ${field.label}`}
-              className={styles.valueInput}
-              wrapperClassName={styles.datePickerWrapper}
-              isClearable
-            />
-          </div>
-        );
-      }
-      // Default text/number input
-      return (
-        <div className={styles.fieldRow} key={`${section}-${i}`}>
+  const renderField = (group, field) => (
+    <div key={field.id} className={styles.inlineWrapper}>
+      <div className={styles.labelWrapper}>
+        {field.isEditing ? (
           <input
-            type="text"
-            className={styles.labelInput}
+            className={styles.editLabelInput}
             value={field.label}
-            onChange={e => handleLabelChange(section, i, e.target.value)}
-            aria-label={`Edit label for ${field.label}`}
+            onChange={(e) => handleLabelChange(group, field.id, e.target.value)}
+            onBlur={() =>
+              setFields(prev => ({
+                ...prev,
+                [group]: prev[group].map(f =>
+                  f.id === field.id ? { ...f, isEditing: false } : f
+                )
+              }))
+            }
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') e.target.blur();
+            }}
           />
-          <input
-            type={field.type || 'text'}
-            className={styles.valueInput}
-            value={field.value}
-            onChange={e => handleValueChange(section, i, e.target.value)}
-            placeholder={`Enter ${field.label}`}
-            aria-label={`Input value for ${field.label}`}
-          />
-        </div>
-      );
-    });
+        ) : (
+          <label
+            className={styles.fixedLabel}
+            onClick={() =>
+              setFields(prev => ({
+                ...prev,
+                [group]: prev[group].map(f =>
+                  f.id === field.id ? { ...f, isEditing: true } : f
+                )
+              }))
+            }
+          >
+            {field.label}
+          </label>
+        )}
+      </div>
+
+      {field.type === 'textarea' ? (
+        <textarea
+          className={styles.inputField}
+          value={field.value}
+          onChange={(e) => handleFieldChange(group, field.id, e.target.value)}
+        />
+      ) : field.type === 'select' ? (
+        <select
+          className={styles.inputField}
+          value={field.value}
+          onChange={(e) => handleFieldChange(group, field.id, e.target.value)}
+        >
+          <option value="">Select</option>
+          {field.options.map(opt => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
+      ) : (
+        <input
+          className={styles.inputField}
+          type={field.type}
+          value={field.value}
+          onChange={(e) => handleFieldChange(group, field.id, e.target.value)}
+        />
+      )}
+
+      <button
+        type="button"
+        className={styles.deleteIcon}
+        onClick={() => handleDelete(group, field.id)}
+      >
+        🗑️
+      </button>
+    </div>
+  );
 
   return (
-    <div className={styles.container}>
-      <form className={styles.form} onSubmit={handleSubmit} noValidate>
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Photo Upload</h2>
-          <div
-            className={styles.photoUpload}
-            onClick={() => fileInputRef.current?.click()}
-            onDragOver={e => e.preventDefault()}
-            onDrop={e => {
-              e.preventDefault();
-              const droppedFile = e.dataTransfer.files[0];
-              if (droppedFile) {
-                setPhoto(droppedFile);
-                setPhotoPreview(URL.createObjectURL(droppedFile));
-              }
-            }}
-          >
-            {photoPreview ? (
-              <>
-                <img src={photoPreview} alt="Uploaded preview" className={styles.photoPreview} />
-                <button type="button" onClick={handlePhotoRemove} className={styles.removePhotoBtn}>
-                  Remove
-                </button>
-              </>
+    <form onSubmit={handleSubmit} className={styles.formContainer}>
+      <div className={styles.photoContainer}>
+        <label htmlFor="photoUpload" className={styles.photoLabel}>
+          <div className={styles.avatar}>
+            {photo ? (
+              <img src={photo} alt="Profile" className={styles.avatarImg} />
             ) : (
-              <p>Click or Drag & Drop to upload your photo</p>
+              <div className={styles.avatarPlaceholder}>📸</div>
             )}
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              onChange={handlePhotoChange}
-              hidden
-            />
           </div>
-        </section>
+          <input
+            type="file"
+            id="photoUpload"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handlePhotoChange}
+          />
+        </label>
 
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Personal Details</h2>
-          {renderFields(personalFields, 'personal')}
-        </section>
+        {photo && (
+          <button
+            type="button"
+            onClick={() => setPhoto(null)}
+            className={styles.removePhotoButton}
+            aria-label="Remove uploaded photo"
+            title="Remove photo"
+          >
+            🗑️
+          </button>
+        )}
+      </div>
 
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Family Details</h2>
-          {renderFields(familyFields, 'family')}
-        </section>
 
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Contact Details</h2>
-          {renderFields(contactFields, 'contact')}
-        </section>
+      <h2 className={styles.sectionTitle}>Marriage Biodata Generator</h2>
 
-        <button type="submit" className={styles.submitBtn}>Submit</button>
-      </form>
+      {Object.entries(fields).map(([group, groupFields]) => (
+        <div key={group} className={styles.groupSection}>
+          <h3 className={styles.groupTitle}>
+            {group.charAt(0).toUpperCase() + group.slice(1)} Details
+          </h3>
 
-      <aside className={styles.preview}>
-        <h3 className={styles.previewTitle}>Preview</h3>
-        <div className={styles.previewContent}>
-          {photoPreview && (
-            <div className={styles.photoPreviewContainer}>
-              <h4>Uploaded Photo</h4>
-              <img src={photoPreview} alt="Preview" className={styles.previewPhoto} />
-            </div>
-          )}
+          {groupFields.map(field => renderField(group, field))}
 
-          <h4>Personal Details</h4>
-          <ul>
-            {personalFields.map((f, i) => (
-              <li key={i} className={styles.previewItem}>
-                <span className={styles.previewLabel}>{f.label}&nbsp;:</span>
-                <span className={styles.previewValue}>{f.value || '-'}</span>
-              </li>
-            ))}
-          </ul>
-
-          <h4>Family Details</h4>
-          <ul>
-            {familyFields.map((f, i) => (
-              <li key={i} className={styles.previewItem}>
-                <span className={styles.previewLabel}>{f.label}&nbsp;:</span>
-                <span className={styles.previewValue}>{f.value || '-'}</span>
-              </li>
-            ))}
-          </ul>
-
-          <h4>Contact Details</h4>
-          <ul>
-            {contactFields.map((f, i) => (
-              <li key={i} className={styles.previewItem}>
-                <span className={styles.previewLabel}>{f.label}&nbsp;:</span>
-                <span className={styles.previewValue}>{f.value || '-'}</span>
-              </li>
-            ))}
-          </ul>
+          <button
+            type="button"
+            className={styles.addFieldButton}
+            onClick={() => handleAddField(group)}
+          >
+            ➕ Add Field
+          </button>
         </div>
-      </aside>
-    </div>
+      ))}
+
+      <div className={styles.buttonRow}>
+        <button type="submit" className={styles.myButton}>Generate Biodata</button>
+        <button type="button" onClick={handleReset} className={styles.downloadButton}>Reset</button>
+      </div>
+    </form>
   );
 };
 
-export default FormWithPreview;
+export default BiodataForm;
