@@ -1,0 +1,61 @@
+.preview {
+  background: #fff;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgb(0 0 0 / 0.1);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #2c3e50;
+  overflow-y: auto;
+  max-height: 90vh;
+  flex-basis: 38%;
+}
+
+.previewTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 0.3rem;
+}
+
+.photoPreviewWrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.photoPreview {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #3498db;
+}
+
+.sectionPreview {
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+  color: #34495e;
+}
+
+.fieldPreview {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.fieldLabel {
+  font-weight: 600;
+  flex: 0 0 130px;
+  color: #555;
+}
+
+.fieldValue {
+  flex: 1;
+  color: #222;
+}

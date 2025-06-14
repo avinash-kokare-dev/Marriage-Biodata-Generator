@@ -1,0 +1,237 @@
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  padding: 1rem;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #f9fafb;
+  color: #333;
+  width: 100%;
+}
+
+.form {
+  max-width: 60%;
+  background: white;
+  padding: 1.5rem 2rem;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgb(0 0 0);
+  flex-basis: 50%;
+}
+
+.title {
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  font-size: 1.8rem;
+  text-align: center;
+  color: #2c3e50;
+}
+
+.photoWrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.photoLabel {
+  cursor: pointer;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border: 2px dashed #94a3b8;
+  font-size: 3rem;
+  color: #64748b;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.photoLabel:hover {
+  background-color: #cbd5e1;
+}
+
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+.removePhotoBtn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  font-size: 1.4rem;
+  color: #e74c3c;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  line-height: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 0.25rem;
+  color: #34495e;
+}
+
+.fieldRow {
+  display: flex;
+  align-items: center;
+  gap: 2.6rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.labelWrapper {
+  flex-shrink: 0;
+  width: 140px;
+}
+
+.labelInput {
+  width: 100%;
+  padding: 6px 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  border: 1.5px solid #aaa;
+  border-radius: 4px;
+  background: #f0f4f8;
+  color: #222;
+  transition: border-color 0.2s ease;
+}
+
+.labelInput:focus {
+  outline: none;
+  border-color: #3498db;
+  background: #eaf6ff;
+}
+
+.inputField,
+.textareaField,
+.selectField {
+  flex: 1 1 auto;
+  min-width: 150px;
+  padding: 7px 10px;
+  font-size: 1rem;
+  border: 1.5px solid #bbb;
+  border-radius: 5px;
+  background: white;
+  color: #333;
+  transition: border-color 0.2s ease;
+}
+
+.inputField:focus,
+.textareaField:focus,
+.selectField:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.textareaField {
+  resize: vertical;
+  min-height: 60px;
+  max-height: 120px;
+  font-family: inherit;
+}
+
+.deleteBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.3rem;
+  padding: 4px 7px;
+  color: #e74c3c;
+  user-select: none;
+  transition: color 0.2s ease;
+}
+
+.deleteBtn:hover {
+  color: #c0392b;
+}
+
+.addFieldBtn {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: background-color 0.3s ease;
+  user-select: none;
+}
+
+.addFieldBtn:hover {
+  background-color: #2c80b4;
+}
+
+.preview {
+  background: #fefefe;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 0 10px rgb(0 0 0 / 0.1);
+  overflow: auto;
+  font-family: monospace;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+  color: #1a1a1a;
+  user-select: text;
+  flex-basis: 38%;
+}
+
+.previewTitle {
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: #34495e;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .form,
+  .preview {
+    max-width: 100%;
+    flex: none;
+  }
+
+  .fieldRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .labelWrapper {
+    width: 100%;
+    margin-bottom: 4px;
+  }
+
+  .inputField,
+  .textareaField,
+  .selectField {
+    width: 100%;
+  }
+}
